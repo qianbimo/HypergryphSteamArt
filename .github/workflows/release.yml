@@ -6,7 +6,6 @@ on:
     branches: [main]
     paths:
       - VERSION
-      - downloads/**
       - .github/workflows/release.yml
 
 permissions:
@@ -18,7 +17,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 10
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,15 +34,15 @@ jobs:
           fi
           tag="v$version"
           package="HypergryphSteamArt-v$version-win-x64.zip"
-          mkdir release-assets
-          for file in "$package" "$package.sha256"; do
-            gh api "repos/$GITHUB_REPOSITORY/contents/downloads/$file?ref=$GITHUB_SHA" --jq '.content' | base64 --decode > "release-assets/$file"
-          done
-          (cd release-assets && sha256sum --check "$package.sha256")
           if gh release view "$tag" > /dev/null 2>&1; then
             echo "Release $tag already exists; leaving its assets unchanged."
             exit 0
           fi
+          gh api "repos/$GITHUB_REPOSITORY/tarball/$GITHUB_SHA" > source.tar.gz
+          mkdir source
+          tar -xzf source.tar.gz --strip-components=1 -C source
+          pwsh -NoProfile -File source/Build-Release.ps1 -Destination release-assets
+          (cd release-assets && sha256sum --check "$package.sha256")
           cat > release-notes.md <<'NOTES'
           ## 鹰角游戏 Steam 图片同步
 
