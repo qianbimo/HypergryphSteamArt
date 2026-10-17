@@ -1,10 +1,9 @@
 # 鹰角游戏 Steam 图片同步
 
-> **[正式 Release 页面](https://github.com/qianbimo/HypergryphSteamArt/releases/latest)** · **直接下载 Windows 分发包**：[HypergryphSteamArt v1.0.0](https://github.com/qianbimo/HypergryphSteamArt/releases/download/v1.0.0/HypergryphSteamArt-v1.0.0-win-x64.zip) · [SHA-256](https://github.com/qianbimo/HypergryphSteamArt/releases/download/v1.0.0/HypergryphSteamArt-v1.0.0-win-x64.zip.sha256)
->
-> 解压后双击 **开始使用.cmd**，输入 **1**。无需安装 Python、Node.js 或 Codex。
+> **[正式 Release 页面](https://github.com/qianbimo/HypergryphSteamArt/releases/latest)** · [下载 v1.0.1 Windows 版](https://github.com/qianbimo/HypergryphSteamArt/releases/download/v1.0.1/HypergryphSteamArt-v1.0.1-win-x64.zip)
 
-**版本 1.0.0 · Windows 10/11 x64 · 国服明日方舟与明日方舟：终末地**
+
+**版本 1.0.1 · Windows 10/11 x64 · 国服明日方舟与明日方舟：终末地**
 
 每次 Steam 启动时，从官方启动器接口获取游戏背景，更新 Steam 自定义背景、宽幅封面、竖版封面及游戏 Logo。竖版封面自动裁切成 600×900，在底部叠加游戏 Logo。终末地详情页 Logo 默认使用 35% 显示区域。
 
@@ -13,7 +12,7 @@
 1. 在 Steam 左下角选择“添加游戏 → 添加非 Steam 游戏”，添加明日方舟或终末地的游戏程序。只使用其中一个游戏也可以。
 2. **正常退出一次 Steam**，以便客户端把快捷方式保存到磁盘。之后可以重新打开 Steam。
 3. 完整解压 ZIP，不要直接在压缩包里运行。双击 **开始使用.cmd**（文件名显示异常时用 `Start.cmd`），输入 **1**。
-4. 程序会识别 Steam、账户和游戏目录；有多个同类条目时才要求选择。识别不到游戏目录时选择文件夹，或取消并使用程序数据目录。
+4. 程序会识别 Steam、账户和游戏目录；有多个同类条目时才要求选择。图片固定保存到当前用户的程序目录，无需选择游戏目录。
 5. 首次启用后，在游戏退出时**正常退出并重新启动 Steam 一次**。以后每次启动 Steam 都会自动检查一次。
 
 安装到当前 Windows 用户的 `%LOCALAPPDATA%\HypergryphSteamArt`，不需要修改脚本路径。无需 Python、Node.js、Codex 或额外安装图片组件。ZIP 内已包含 WebP 解码工具。
@@ -51,7 +50,12 @@
 
 ## 4. 保存位置与 Logo 回退
 
-游戏目录可写时，生成图片存到 **游戏目录/backgroud/**，保留用户要求的拼写：
+全部下载、解码和合成图片固定保存在当前 Windows 用户目录下，按游戏分开：
+
+- 明日方舟：`%LOCALAPPDATA%\HypergryphSteamArt\Arknights\`
+- 终末地：`%LOCALAPPDATA%\HypergryphSteamArt\ArknightsEndfield\`
+
+每个目录包含：
 
 | 文件 | 用途 |
 | --- | --- |
@@ -60,7 +64,7 @@
 | latest-cover.jpg | 自动合成的 600×900 竖版封面，底部有游戏 Logo |
 | latest-logo.png | 本次使用的游戏 Logo |
 
-游戏目录无法识别或不可写时，自动存到安装目录 `data/images/arknights/` 或 `data/images/endfield/`。Steam 的最终图片仍写入所选账户的 `userdata/<账户ID>/config/grid/`。
+程序不再向游戏目录写入图片；不需要游戏目录的写权限。Steam 的最终图片仍写入所选账户的 `userdata/<账户ID>/config/grid/`。
 
 不使用活动标题作为游戏 Logo。优先使用用户配置的 Logo，未配置则查找游戏目录同名 Logo；读取失败时依次回退到安装目录的 `Logo_明日方舟.png` 或 `Logo_明日方舟终末地.png`、游戏目录同名文件及最近缓存。图片缺失、损坏、非 PNG、尺寸太小、完全透明均视为不可用。
 
@@ -74,7 +78,7 @@
 
 原图只备份一次，不会被后续同步覆盖；若最初没有自定义图，备份清单会记录“无图片”。菜单 6 会移除本工具管理的对应图片，再恢复备份，原先没有图片时恢复为 Steam 默认。请先正常退出 Steam，否则缓存可能让恢复结果暂时不可见。
 
-卸载建议：先选菜单 6 恢复原图（可选），再选菜单 7；正常重启 Steam 以关闭调试接口。确认不再需要备份后，手动删除 `%LOCALAPPDATA%\HypergryphSteamArt` 即可。游戏 `backgroud` 内的导出图片按需手动保留或删除。程序不删除游戏文件。
+卸载建议：先选菜单 6 恢复原图（可选），再选菜单 7；正常重启 Steam 以关闭调试接口。确认不再需要备份后，手动删除 `%LOCALAPPDATA%\HypergryphSteamArt` 即可。旧版曾生成的游戏 `backgroud` 图片不会自动删除，如需清理可手动处理。程序不删除游戏文件。
 
 菜单 7 只移除本程序创建的调试标记；如果安装前已由其他工具启用，会保留它，避免影响其他工具。
 
@@ -88,7 +92,7 @@
 | userId | 所选 Steam userdata 目录名，不是登录密码 |
 | games[].enabled | true 启用，false 跳过该游戏 |
 | games[].appId | 从 shortcuts.vdf 读取的真实 appid，重新入库后需重新识别 |
-| games[].gameDirectory | 游戏目录；留空则使用程序图片目录 |
+| games[].gameDirectory | 可选游戏目录，仅用于查找本地 Logo，不影响图片保存位置 |
 | games[].logoPath | 可选的自定义透明 PNG 绝对路径；留空使用默认策略 |
 | games[].logoSizePercent | 详情页 Logo 宽高显示区域百分比；0 保留原设置，终末地默认 35。此值不是图片像素尺寸 |
 
@@ -107,13 +111,13 @@ JSON 路径中的反斜杠需写为 `\\`，或使用 `/`。不要编辑 schemaVe
 | 图标太大 / 太小 | 修改 logoSizePercent；0 表示保留已有设置，终末地默认 35 |
 | 网络 / MD5 校验失败 | 保留原图，检查网络后手动更新。接口可能临时维护或变动 |
 | dwebp.exe 缺失 | 重新完整解压官方分发包，不要单独复制脚本；从可信来源取得包并核对 SHA-256 |
-| 图片写到程序目录而非游戏目录 | 游戏目录未识别或不可写；菜单 4 重选，或手动修改 gameDirectory |
+| 游戏目录不再出现新图片 | 这是 1.0.1 起的预期行为，请查看程序目录中的 Arknights / ArknightsEndfield |
 | 换账户 / 重装游戏 / 重新入库 | 菜单 4 重新识别；重新入库可能产生新的 appid |
 | 中文入口名称异常 | 双击 ASCII 文件名 Start.cmd；支持中文、空格路径 |
 | 退出菜单后进程仍在 | 监视器正常运行；菜单 5 才会停止后台 |
 | 更新提示已有实例 | 等待正在进行的更新完成后再操作，不要重复启动 |
 
-日志位置：安装目录 `data/last-update.log`（最近一次启动更新输出）、`data/last-run.json`（启动触发结果）、`data/watcher.log`（监视器异常）、`data/arknights/errors.log` / `data/endfield/errors.log`（单游戏错误）。日志可能包含本机路径和 Steam userdata ID，公开提交前请自行隐藏。
+日志位置：安装目录 `data/last-update.log`（最近一次启动更新输出）、`data/last-run.json`（启动触发结果）、`data/watcher.log`（监视器异常）、`Arknights/errors.log` / `ArknightsEndfield/errors.log`（单游戏错误）。日志可能包含本机路径和 Steam userdata ID，公开提交前请自行隐藏。
 
 首次联网更新需要官方接口和官方图片 CDN 可用；整个安装包无法保证在所有网络环境下成功访问。Steam 内部接口并非对第三方提供的稳定 API，客户端更新后可能需要适配；失败时仍尝试磁盘写图，必要时重启 Steam 查看。
 

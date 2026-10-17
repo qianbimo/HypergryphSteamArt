@@ -57,6 +57,8 @@ jobs:
 
           ### 功能
 
+          图片统一保存到 `%LOCALAPPDATA%\HypergryphSteamArt\Arknights\` 与 `ArknightsEndfield\`，不再写入游戏目录。兼容启用文件加密的 Windows 用户目录。
+
           - 每次 Steam 启动后更新一次官方背景，运行期间不重复下载。
           - 自动生成底部带游戏 Logo 的 600×900 竖版封面。
           - 支持背景、宽幅封面、Logo 即时刷新，以及默认 Logo 回退。

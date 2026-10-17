@@ -40,10 +40,6 @@ function Configure-Art {
             $entry=$matches[[int]$choice-1]
         }
         $dir=Get-ArtGameDirectory $entry $kind
-        if(!$dir){
-            Write-Host "未能确定 $($entry.Name) 的游戏目录。可以选择文件夹，取消则把图片存到程序数据目录。"
-            $dir=Select-ArtFolder "选择 $($entry.Name) 游戏目录；取消使用程序数据目录"
-        }
         $games+=[pscustomobject]@{kind=$kind;name=$entry.Name;appId=$entry.AppId;enabled=$true;gameDirectory=$dir;logoPath='';logoSizePercent=$(if($kind -eq 'endfield'){35}else{0})}
     }
     $marker=Join-Path $steam '.cef-enable-remote-debugging'
@@ -141,7 +137,7 @@ function Invoke-ArtAction([string]$Name){
 }
 if($Action -ne 'Menu'){Invoke-ArtAction $Action;return}
 while($true){
-    Write-Host "`n鹰角游戏 Steam 图片同步 1.0.0" -ForegroundColor Cyan
+    Write-Host "`n鹰角游戏 Steam 图片同步 1.0.1" -ForegroundColor Cyan
     Write-Host '1. 启用 / 更新程序（首次使用选这个）'
     Write-Host '2. 立即更新图片'
     Write-Host '3. 查看状态'

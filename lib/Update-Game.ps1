@@ -19,6 +19,7 @@ Add-Type -AssemblyName System.Drawing
 . (Join-Path $PSScriptRoot 'Steam-LiveRefresh.ps1')
 . (Join-Path $PSScriptRoot 'Cover-Composer.ps1')
 . (Join-Path $PSScriptRoot 'Logo-Resolver.ps1')
+. (Join-Path $PSScriptRoot 'Write-ImageFile.ps1')
 . (Join-Path $PSScriptRoot 'Common.ps1')
 $dataDir = if ($DataPath) { $DataPath } else { Join-Path $PSScriptRoot 'data' }
 [IO.Directory]::CreateDirectory($dataDir) | Out-Null
@@ -88,10 +89,7 @@ function Invoke-Update {
                 @{Source=$jpg; Name='latest.jpg'}
             )) {
                 $saved = Join-Path $BackgroundPath $item.Name
-                $pending = "$saved.tmp"
-                Copy-Item -LiteralPath $item.Source -Destination $pending -Force
-                if (Test-Path -LiteralPath $saved) { [IO.File]::Replace($pending,$saved,[NullString]::Value) }
-                else { [IO.File]::Move($pending,$saved) }
+                Publish-GameImage $item.Source $saved
             }
             $jpg = Join-Path $BackgroundPath 'latest.jpg'
             Write-Host "Background saved: $jpg"
@@ -118,20 +116,14 @@ function Invoke-Update {
     if ($logoPng) {
     if (!$Preview) {
         $savedLogo = Join-Path $BackgroundPath 'latest-logo.png'
-        $pendingLogo = "$savedLogo.tmp"
-        Copy-Item -LiteralPath $logoPng -Destination $pendingLogo -Force
-        if (Test-Path -LiteralPath $savedLogo) { [IO.File]::Replace($pendingLogo,$savedLogo,[NullString]::Value) }
-        else { [IO.File]::Move($pendingLogo,$savedLogo) }
+        Publish-GameImage $logoPng $savedLogo
     }
     $assets += @{Suffix='_logo';Type=2;Path=$logoPng;Extension='png';Size="$GameName logo"}
     $coverPath = Join-Path $dataDir 'latest-cover.jpg'
     [ArknightsCoverComposer]::Create($jpg,$logoPng,$coverPath)
     if (!$Preview) {
         $savedCover = Join-Path $BackgroundPath 'latest-cover.jpg'
-        $pendingCover = "$savedCover.tmp"
-        Copy-Item -LiteralPath $coverPath -Destination $pendingCover -Force
-        if (Test-Path -LiteralPath $savedCover) { [IO.File]::Replace($pendingCover,$savedCover,[NullString]::Value) }
-        else { [IO.File]::Move($pendingCover,$savedCover) }
+        Publish-GameImage $coverPath $savedCover
         $coverPath = $savedCover
     }
     $assets[0].Path = $coverPath
@@ -153,10 +145,7 @@ function Invoke-Update {
             Write-Host "Unchanged: $($target.User)/$baseName"; continue
         }
         # Stage on the same volume before replacing the destination.
-        $staged = "$destination.tmp"
-        Copy-Item -LiteralPath $asset.Path -Destination $staged -Force
-        if (Test-Path -LiteralPath $destination) { [IO.File]::Replace($staged,$destination,[NullString]::Value) }
-        else { [IO.File]::Move($staged,$destination) }
+        Publish-GameImage $asset.Path $destination
         foreach ($old in $existing) { if ($old.FullName -ne $destination) { Remove-Item -LiteralPath $old.FullName } }
         Update-LiveBackground $target $asset.Path $asset.Type
         Write-Host "Updated: $($target.User)/$baseName, $($asset.Size)."
