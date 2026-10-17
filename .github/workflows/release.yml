@@ -42,7 +42,7 @@ jobs:
           mkdir source
           tar -xzf source.tar.gz --strip-components=1 -C source
           pwsh -NoProfile -File source/Build-Release.ps1 -Destination release-assets
-          (cd release-assets && sha256sum --check "$package.sha256")
+          (cd release-assets && tr -d '\r' < "$package.sha256" | sha256sum --check)
           cat > release-notes.md <<'NOTES'
           ## 鹰角游戏 Steam 图片同步
 

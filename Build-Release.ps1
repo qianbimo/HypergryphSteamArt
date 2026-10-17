@@ -22,7 +22,7 @@ $lines=foreach($file in ($files|Sort-Object FullName)){
 $zip=Join-Path $Destination "$packageName.zip"
 Compress-Archive -LiteralPath $root -DestinationPath $zip -Force
 $hash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-[IO.File]::WriteAllText("$zip.sha256","$hash  $packageName.zip`r`n",[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText("$zip.sha256","$hash  $packageName.zip`n",[Text.UTF8Encoding]::new($false))
 Write-Host "Package: $zip"
 Write-Host "SHA256: $hash"
 Write-Host "Staging folder retained for inspection: $root"
