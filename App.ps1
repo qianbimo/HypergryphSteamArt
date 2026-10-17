@@ -2,15 +2,6 @@
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'lib\Common.ps1')
 
-function Install-ArtPackage {
-    if([IO.Path]::GetFullPath($script:ArtRoot).TrimEnd('\') -eq [IO.Path]::GetFullPath($script:ArtInstall).TrimEnd('\')){return}
-    if(Test-Path -LiteralPath (Join-Path $script:ArtInstall 'App.ps1')){Stop-ArtWatcher}
-    [IO.Directory]::CreateDirectory($script:ArtInstall)|Out-Null
-    foreach($name in @('App.ps1','Start.cmd','开始使用.cmd','README.md','先读我.txt','VERSION','THIRD-PARTY-NOTICES.md','Logo_明日方舟.png','Logo_明日方舟终末地.png','lib','tools','docs')){
-        Copy-Item -LiteralPath (Join-Path $script:ArtRoot $name) -Destination $script:ArtInstall -Recurse -Force
-    }
-    Write-Host "程序已安装到：$script:ArtInstall"
-}
 function Configure-Art {
     $steam=Find-ArtSteam
     if(!$steam){$steam=Select-ArtFolder '请选择包含 steam.exe 的 Steam 安装文件夹'}
@@ -65,6 +56,7 @@ function Enable-Art {
     Enable-ArtStartup
     Start-ArtWatcher
     Write-Host '已启用：每次 Steam 启动只检查一次；后台每 3 秒仅检查本机进程，不重复下载。' -ForegroundColor Green
+    Write-Host "便携运行目录：$script:ArtRoot，请保留此文件夹；移动前先停用，移动后重新启用。"
     Write-Host '本机调试接口允许本机程序操作 Steam 界面；不要转发 8080 端口。程序不会自动重启 Steam。'
 }
 function Disable-Art {
@@ -95,6 +87,7 @@ function Restore-Art {
 }
 function Show-ArtStatus {
     Write-Host "程序目录：$script:ArtRoot"
+    Write-Host "数据目录：$script:ArtHome"
     Write-Host "登录自动启动：$(Test-Path -LiteralPath $script:ArtStartup)"
     try{$m=[Threading.Mutex]::OpenExisting('Local\HypergryphSteamArtWatcher');$m.Dispose();Write-Host '启动监视器：运行中'}catch{Write-Host '启动监视器：未运行'}
     if(Test-Path -LiteralPath $script:ArtConfigPath){$c=Get-ArtConfig;Write-Host "Steam：$($c.steamPath)";foreach($g in $c.games){Write-Host "  $($g.name) / $($g.appId) / 启用=$($g.enabled)"}}
@@ -113,18 +106,10 @@ function Uninstall-Art {
         }
     }
     Write-Host '已卸载后台启动并移除本程序创建的调试标记。重启 Steam 后关闭本机接口。'
-    Write-Host "图片和备份仍保留。确认无需恢复后，可手动删除：$script:ArtRoot"
+    Write-Host "程序代码位于：$script:ArtRoot，可手动删除解压目录。"
+    Write-Host "图片、配置和备份仍保留于：$script:ArtHome，确认无需恢复后再删除。"
 }
 function Invoke-ArtAction([string]$Name){
-    if($script:ArtRoot -ne $script:ArtInstall -and $Name -eq 'Enable'){
-        Install-ArtPackage
-        & (Join-Path $script:ArtInstall 'App.ps1') -Action Enable
-        return
-    }
-    if($script:ArtRoot -ne $script:ArtInstall -and (Test-Path -LiteralPath (Join-Path $script:ArtInstall 'App.ps1'))){
-        & (Join-Path $script:ArtInstall 'App.ps1') -Action $Name
-        return
-    }
     switch($Name){
         Enable{Enable-Art}
         Update{Stop-ArtWatcher;try{& (Join-Path $script:ArtRoot 'lib\Update.ps1')}finally{if(Test-Path -LiteralPath $script:ArtStartup){Start-ArtWatcher -SkipCurrent}}}
@@ -137,8 +122,8 @@ function Invoke-ArtAction([string]$Name){
 }
 if($Action -ne 'Menu'){Invoke-ArtAction $Action;return}
 while($true){
-    Write-Host "`n鹰角游戏 Steam 图片同步 1.0.1" -ForegroundColor Cyan
-    Write-Host '1. 启用 / 更新程序（首次使用选这个）'
+    Write-Host "`n鹰角游戏 Steam 图片同步 1.0.2 · 便携版" -ForegroundColor Cyan
+    Write-Host '1. 启用自动更新（首次使用 / 移动目录后选这个）'
     Write-Host '2. 立即更新图片'
     Write-Host '3. 查看状态'
     Write-Host '4. 重新识别游戏 / 更换账户'

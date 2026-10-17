@@ -2,10 +2,12 @@
 $ErrorActionPreference='Stop'
 $sourceRoot=Split-Path $PSScriptRoot -Parent
 $root=$PackageRoot
-. (Join-Path $root 'lib\Common.ps1')
+
 Add-Type -AssemblyName System.Drawing
 $run=Join-Path $WorkPath ([guid]::NewGuid().ToString('N'))
 [IO.Directory]::CreateDirectory($run)|Out-Null
+$env:HYPERGRYPH_STEAM_ART_HOME=Join-Path $run 'user data'
+. (Join-Path $root 'lib\Common.ps1')
 $steam=Join-Path $run '中文 Steam with spaces'
 $user=[string](Get-Random -Minimum 990000000 -Maximum 999999999)
 $grid=Join-Path $steam "userdata\$user\config\grid"
@@ -51,7 +53,7 @@ $originalHash=(Get-FileHash $original).Hash
 $params=@{SteamPath=$steam;UserId=$user;ShortcutId='3999999901';GameName='已改名的明日方舟';BackgroundPath=(Join-Path $game1 'backgroud');DataPath=(Join-Path $run 'cache1');LogoPath=(Join-Path $run 'missing.png');FallbackLogoPath=(Join-Path $root 'Logo_明日方舟.png')}
 & (Join-Path $root 'lib\Update-Game.ps1') @params
 if(!(Test-Path -LiteralPath (Join-Path $grid '3999999901p.jpg'))){throw 'Composed cover missing'}
-$manifest=Join-Path $root "data\originals\$user\3999999901\manifest.json"
+$manifest=Join-Path $script:ArtHome "data\originals\$user\3999999901\manifest.json"
 if(!(Test-Path -LiteralPath $manifest)){throw 'Original backup missing'}
 $saved=Join-Path (Split-Path $manifest -Parent) '3999999901p.png'
 if((Get-FileHash $saved).Hash -ne $originalHash){throw 'Original artwork was not preserved'}
@@ -78,16 +80,12 @@ $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseF
 foreach($function in $ast.FindAll({param($a)$a -is [Management.Automation.Language.FunctionDefinitionAst]},$false)){
     . ([scriptblock]::Create($function.Extent.Text))
 }
-$script:ArtInstall=Join-Path $run 'installed copy'
-Install-ArtPackage
-Install-ArtPackage
-if(!(Test-Path -LiteralPath (Join-Path $script:ArtInstall 'tools\dwebp.exe'))){throw 'Installed package misses decoder'}
-if(Test-Path -LiteralPath (Join-Path $script:ArtInstall 'data')){throw 'Installer copied personal data'}
+if(Test-Path -LiteralPath (Join-Path $script:ArtHome 'App.ps1')){throw 'Program code was copied to data directory'}
 # Do not stop any real Steam/watcher processes in the restore test.
 function Disable-Art {}
 function Get-Process {}
 Restore-Art
 if(!(Test-Path -LiteralPath $original) -or (Get-FileHash $original).Hash -ne $originalHash){throw 'Restoration failed'}
 if(Test-Path -LiteralPath (Join-Path $grid '3999999902p.jpg')){throw 'No-original artwork was not removed on restore'}
-Write-Host 'PASS: isolated per-user installation copy and original artwork restoration.'
+Write-Host 'PASS: portable code/data separation and original artwork restoration.'
 Write-Host "ALL DISTRIBUTION TESTS PASSED. Fixtures: $run"

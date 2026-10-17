@@ -21,7 +21,7 @@ Add-Type -AssemblyName System.Drawing
 . (Join-Path $PSScriptRoot 'Logo-Resolver.ps1')
 . (Join-Path $PSScriptRoot 'Write-ImageFile.ps1')
 . (Join-Path $PSScriptRoot 'Common.ps1')
-$dataDir = if ($DataPath) { $DataPath } else { Join-Path $PSScriptRoot 'data' }
+$dataDir = if ($DataPath) { $DataPath } else { Join-Path $script:ArtData 'work' }
 [IO.Directory]::CreateDirectory($dataDir) | Out-Null
 
 function Get-Targets {

@@ -1,7 +1,7 @@
 ﻿$script:ArtRoot = Split-Path $PSScriptRoot -Parent
-$script:ArtData = Join-Path $script:ArtRoot 'data'
+$script:ArtHome = if ($env:HYPERGRYPH_STEAM_ART_HOME) { [IO.Path]::GetFullPath($env:HYPERGRYPH_STEAM_ART_HOME) } else { Join-Path $env:LOCALAPPDATA 'HypergryphSteamArt' }
+$script:ArtData = Join-Path $script:ArtHome 'data'
 $script:ArtConfigPath = Join-Path $script:ArtData 'settings.json'
-$script:ArtInstall = Join-Path $env:LOCALAPPDATA 'HypergryphSteamArt'
 $script:ArtStartup = Join-Path ([Environment]::GetFolderPath('Startup')) 'HypergryphSteamArt.lnk'
 function Read-ZeroString([IO.BinaryReader]$Reader) {
     $bytes = New-Object 'System.Collections.Generic.List[byte]'

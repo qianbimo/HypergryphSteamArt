@@ -1,4 +1,4 @@
-﻿鹰角游戏 Steam 图片同步 1.0.1
+﻿鹰角游戏 Steam 图片同步 1.0.2 · 便携版
 
 适用：Windows 10/11 64 位，国服明日方舟 / 明日方舟：终末地。
 无需安装 Python、Node.js 或 Codex。
@@ -8,8 +8,8 @@
 2. 解压整个压缩包，双击“开始使用.cmd”，输入 1。
 3. 首次启用后，正常重启 Steam 一次。此后每次启动 Steam 自动同步图片。
 
-安装到：%LOCALAPPDATA%\HypergryphSteamArt
-安装完成后可删除下载的 ZIP 和解压目录，已安装程序不受影响。
+数据保存到：%LOCALAPPDATA%\HypergryphSteamArt
+程序代码只在解压目录运行，请保留解压目录。移动前选 5 停用，移动后选 1 重新启用。
 
 同一菜单可立即更新、查看状态、重新识别、停用、恢复原图和卸载后台。
 详细步骤、权限处理、迁移旧版和故障排查：docs\使用说明.html
@@ -18,4 +18,4 @@
 Logo 使用游戏字标，不使用活动标题。即时刷新需要 Steam 本机调试接口，
 仅供本机使用，勿转发 8080 端口。未经官方授权的社区工具，不代表鹰角或 Valve。
 
-图片目录：安装目录下的 Arknights 和 ArknightsEndfield，不再写入游戏目录。
+图片目录：数据目录下的 Arknights 和 ArknightsEndfield，不再写入游戏目录。

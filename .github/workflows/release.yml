@@ -54,6 +54,8 @@ jobs:
 
           无需安装 Python、Node.js 或 Codex。请下载本页附带的 Windows ZIP；GitHub 自动生成的 Source code 压缩包是源码归档。
 
+          便携版：程序直接从解压目录运行，不复制代码到用户目录。请保留解压目录；移动前先停用，移动后重新启用。
+
           ### 功能
 
           图片统一保存到 `%LOCALAPPDATA%\HypergryphSteamArt\Arknights\` 与 `ArknightsEndfield\`，不再写入游戏目录。兼容启用文件加密的 Windows 用户目录。
