@@ -1,6 +1,6 @@
 # 鹰角游戏 Steam 图片同步
 
-> **直接下载 Windows 分发包**：[HypergryphSteamArt v1.0.0](downloads/HypergryphSteamArt-v1.0.0-win-x64.zip?raw=true) · [SHA-256](downloads/HypergryphSteamArt-v1.0.0-win-x64.zip.sha256)
+> **[正式 Release 页面](https://github.com/qianbimo/HypergryphSteamArt/releases/latest)** · **直接下载 Windows 分发包**：[HypergryphSteamArt v1.0.0](https://github.com/qianbimo/HypergryphSteamArt/releases/download/v1.0.0/HypergryphSteamArt-v1.0.0-win-x64.zip) · [SHA-256](https://github.com/qianbimo/HypergryphSteamArt/releases/download/v1.0.0/HypergryphSteamArt-v1.0.0-win-x64.zip.sha256)
 >
 > 解压后双击 **开始使用.cmd**，输入 **1**。无需安装 Python、Node.js 或 Codex。
 
