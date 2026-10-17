@@ -1,0 +1,75 @@
+name: Publish Windows Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - VERSION
+      - downloads/**
+      - .github/workflows/release.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-windows-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Verify package and publish release
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(gh api "repos/$GITHUB_REPOSITORY/contents/VERSION?ref=$GITHUB_SHA" --jq '.content' | base64 --decode | tr -d '\r\n')
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'VERSION must be a semantic version such as 1.0.0.' >&2
+            exit 1
+          fi
+          tag="v$version"
+          package="HypergryphSteamArt-v$version-win-x64.zip"
+          mkdir release-assets
+          for file in "$package" "$package.sha256"; do
+            gh api "repos/$GITHUB_REPOSITORY/contents/downloads/$file?ref=$GITHUB_SHA" --jq '.content' | base64 --decode > "release-assets/$file"
+          done
+          (cd release-assets && sha256sum --check "$package.sha256")
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "Release $tag already exists; leaving its assets unchanged."
+            exit 0
+          fi
+          cat > release-notes.md <<'NOTES'
+          ## 鹰角游戏 Steam 图片同步
+
+          适用于 Windows 10/11 x64，支持国服「明日方舟」与「明日方舟：终末地」。
+
+          ### 下载与使用
+
+          下载下方 **win-x64.zip** 文件，完整解压，双击 **开始使用.cmd**，输入 **1**。首次启用后正常重启 Steam 一次。
+
+          无需安装 Python、Node.js 或 Codex。请下载本页附带的 Windows ZIP；GitHub 自动生成的 Source code 压缩包是源码归档。
+
+          ### 功能
+
+          - 每次 Steam 启动后更新一次官方背景，运行期间不重复下载。
+          - 自动生成底部带游戏 Logo 的 600×900 竖版封面。
+          - 支持背景、宽幅封面、Logo 即时刷新，以及默认 Logo 回退。
+          - 自动识别 Steam 与游戏目录，提供停用、原图恢复和卸载入口。
+          - 内含离线使用说明与独立 WebP 解码器。
+
+          ZIP 同时提供 SHA-256 校验文件。已有旧版计划任务的用户，请先运行旧版 Disable-AutoUpdate.cmd，再启用新版，避免重复更新。
+
+          社区工具，未获鹰角或 Valve 官方背书。游戏素材权利归原权利人；第三方组件许可随包附带。
+          NOTES
+          gh release create "$tag" "release-assets/$package" "release-assets/$package.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "HypergryphSteamArt $tag · Windows x64" \
+            --notes-file release-notes.md \
+            --latest
+          gh release view "$tag" --json url --jq '.url'
